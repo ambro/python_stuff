@@ -1,4 +1,5 @@
 import sqlite3
+from typing import Tuple
 
 
 class DatabaseConnection:
@@ -7,7 +8,7 @@ class DatabaseConnection:
         self.file_name = db_file_name
         self.connection = None
 
-    def __enter__(self):
+    def __enter__(self) -> Tuple[sqlite3.Connection, sqlite3.Cursor]:
         print("starting context manager scope")
         self.connection = sqlite3.connect(self.file_name)
         return self.connection, self.connection.cursor()
