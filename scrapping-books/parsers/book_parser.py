@@ -3,6 +3,15 @@ from locators.book_selectors import BookSelectors
 
 
 class BookParser:
+
+    RATINGS = {
+        'One': 1,
+        'Two': 2,
+        'Three': 3,
+        'Four': 4,
+        'Five': 5
+    }
+
     def __init__(self, book_element):
         self.book = book_element
         self.price_pattern = '[0-9.]+'
@@ -55,35 +64,40 @@ class BookParser:
     def _set_rating(self, rating):
         self._rating = rating
 
-    def _parse_title(self, tag):
+    @classmethod
+    def _parse_title(cls, tag):
         return tag.attrs['title']
 
     def _parse_price(self, tag):
         matcher = re.search(self.price_pattern, tag.string)
         return float(matcher.group(0))
 
-    def _parse_rating(self, tag):
+    @classmethod
+    def _parse_rating(cls, tag):
         rating = None
         for class_name in tag.attrs['class']:
-            if class_name == "One":
-                rating = 1
-            elif class_name == "Two":
-                rating = 2
-            elif class_name == "Three":
-                rating = 3
-            elif class_name == "Four":
-                rating = 4
-            elif class_name == "Five":
-                rating = 5
+            if (parsed_rating := cls.RATINGS.get(class_name)) is not None:
+                rating = parsed_rating
 
         if not rating:
-            raise BookRatingException(f"Unknown rating in: {tag.attrs['class']}")
+            return BookRatingException(f"Unknown rating in: {tag.attrs['class']}")
         else:
             return rating
 
-    def _parse_in_stock(self, tag):
+    @classmethod
+    def _parse_in_stock(cls, tag):
         return True if tag.text.strip() == "In stock" else False
 
 
 class BookRatingException(Exception):
     pass
+
+
+class GermanBookParser(BookParser):
+    RATINGS = {
+        'Eins': 1,
+        'Zwei': 2,
+        'Drei': 3,
+        'Vier': 4,
+        'Funf': 5
+    }
