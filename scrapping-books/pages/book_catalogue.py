@@ -8,7 +8,6 @@ class BookCatalogue:
     def __init__(self, count):
         self.pages = []
         self.books = []
-        self.start_page = "http://books.toscrape.com/catalogue/page-1.html"
         self.logger = logging.getLogger('BookCatalogue')
         self.count = count
 
@@ -30,6 +29,7 @@ class BookCatalogue:
         books_page = BooksPage(page_content)
         return books_page
 
-    def _get_url(self, page):
-        return self.start_page.replace('1', str(page))
+    @classmethod
+    def _get_url(cls, page):
+        return f"http://books.toscrape.com/catalogue/page-{page}.html"
 
