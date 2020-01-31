@@ -1,5 +1,6 @@
 import requests
-import functools
+from cachetools import cached, TTLCache
+
 
 class OpenExchangeClient:
     BASE_URL = "https://openexchangerates.org/api/latest.json"
@@ -7,7 +8,7 @@ class OpenExchangeClient:
     def __init__(self, app_id):
         self.app_id = app_id
 
-    @functools.lru_cache(maxsize=2)
+    @cached(cache=TTLCache( maxsize=2, ttl=900))
     def convert(self, amount, from_currency, to_currency,):
         rates = self.latest["rates"]
         to_rate = rates[to_currency]
@@ -15,7 +16,7 @@ class OpenExchangeClient:
         if from_currency == "USD":
             return amount * to_rate
         else:
-            from_in_usd = amount /rates[from_currency]
+            from_in_usd = amount / rates[from_currency]
             return from_in_usd * to_rate
 
     @property
